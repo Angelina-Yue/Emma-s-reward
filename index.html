@@ -1,142 +1,530 @@
-<!DOCTYPE html>
-<html lang="zh">
+<!doctype html>
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kuromi 一番赏</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kuromi 一番赏</title>
+  <style>
+    :root{
+      --bg1:#e9dcff;
+      --bg2:#d3c0ff;
+      --bg3:#b69cff;
+      --ink:#3b2458;
+      --card: rgba(255,255,255,.72);
+      --card2: rgba(255,255,255,.86);
+      --shadow: 0 14px 40px rgba(55,18,92,.20);
+      --accent:#ff86c8;
+      --accent2:#ffd27a;
+      --line:#8a6db6;
+    }
 
-<style>
-body {
-    margin: 0;
-    font-family: "Arial", sans-serif;
-    background: linear-gradient(to bottom, #d8b4f8, #a855f7);
-    text-align: center;
-    color: white;
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-rounded, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", Arial;
+      color: var(--ink);
+      min-height:100vh;
+      overflow-x:hidden;
+      background:
+        radial-gradient(900px 520px at 50% 18%, rgba(255,255,255,.75), transparent 55%),
+        radial-gradient(800px 520px at 20% 60%, rgba(255,255,255,.30), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2) 45%, var(--bg3));
+      position:relative;
+    }
 
-.header {
-    background: #6b21a8;
-    padding: 20px;
-    font-size: 22px;
-    font-weight: bold;
-}
+    /* 顶部条纹棚 */
+    .awning{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:86px;
+      z-index:1;
+      background:
+        repeating-linear-gradient(90deg,
+          rgba(255,255,255,.85) 0 48px,
+          rgba(155,119,206,.55) 48px 96px);
+      border-bottom-left-radius: 28px;
+      border-bottom-right-radius: 28px;
+      box-shadow: 0 10px 26px rgba(55,18,92,.18);
+      opacity:.95;
+    }
+    .awning::after{
+      content:"";
+      position:absolute; inset:auto 0 0 0;
+      height:14px;
+      background: rgba(255,255,255,.45);
+      filter: blur(.2px);
+    }
 
-.subtitle {
-    font-size: 14px;
-    opacity: 0.8;
-}
+    /* 主容器 */
+    .wrap{
+      position:relative;
+      z-index:2;
+      width:min(460px, 92vw);
+      margin: 106px auto 40px;
+      padding: 18px 18px 20px;
+    }
 
-.container {
-    padding: 20px;
-}
+    /* 画框卡片 */
+    .frame{
+      position:relative;
+      background: rgba(255,255,255,.35);
+      border: 3px solid rgba(255,255,255,.55);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 18px 16px 20px;
+      backdrop-filter: blur(8px);
+      overflow:hidden;
+    }
+    /* 内边框线 */
+    .frame::before{
+      content:"";
+      position:absolute; inset:12px;
+      border-radius: 20px;
+      border: 2px dashed rgba(138,109,182,.55);
+      pointer-events:none;
+    }
 
-.prize {
-    background: rgba(255,255,255,0.15);
-    border-radius: 15px;
-    margin: 15px 0;
-    padding: 15px;
-}
+    /* 角落蝴蝶结（纯CSS简化版） */
+    .bow{
+      position:absolute;
+      width:56px; height:56px;
+      z-index:3;
+      filter: drop-shadow(0 10px 14px rgba(55,18,92,.18));
+    }
+    .bow::before,.bow::after{
+      content:"";
+      position:absolute;
+      width:28px; height:20px;
+      background: rgba(255,255,255,.86);
+      border: 2px solid rgba(138,109,182,.55);
+      border-radius: 16px 16px 6px 16px;
+      top:16px;
+    }
+    .bow::after{
+      border-radius: 16px 16px 16px 6px;
+    }
+    .bow .knot{
+      position:absolute;
+      width:14px; height:14px;
+      left:21px; top:22px;
+      background: rgba(255,255,255,.92);
+      border: 2px solid rgba(138,109,182,.55);
+      border-radius:999px;
+    }
+    .bow.tl{left:12px; top:12px}
+    .bow.tl::before{left:0; transform: rotate(-14deg)}
+    .bow.tl::after{right:0; transform: rotate(14deg)}
+    .bow.tr{right:12px; top:12px; transform: scaleX(-1)}
+    .bow.bl{left:12px; bottom:12px; transform: scaleY(-1)}
+    .bow.br{right:12px; bottom:12px; transform: scale(-1)}
 
-.prize h2 {
-    margin: 5px 0;
-}
+    /* 星星爱心点缀 */
+    .doodles{
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.9;
+    }
+    .dot{
+      position:absolute;
+      font-size:14px;
+      color: rgba(59,36,88,.55);
+      animation: floaty 4.2s ease-in-out infinite;
+    }
+    .star{
+      color: rgba(255,210,122,.92);
+      text-shadow: 0 8px 18px rgba(55,18,92,.18);
+      font-size:16px;
+    }
+    @keyframes floaty{
+      0%,100%{ transform: translateY(0) }
+      50%{ transform: translateY(-8px) }
+    }
 
-.count {
-    font-size: 14px;
-    opacity: 0.9;
-}
+    .title{
+      text-align:center;
+      padding: 10px 6px 2px;
+      margin: 4px 0 10px;
+    }
+    .title h1{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.5px;
+    }
+    .title p{
+      margin:6px 0 0;
+      font-size: 13px;
+      opacity:.78;
+    }
 
-button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    border-radius: 30px;
-    border: none;
-    font-size: 16px;
-    background: #f472b6;
-    color: white;
-    cursor: pointer;
-}
+    /* 奖池列表 */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .prize{
+      background: var(--card);
+      border: 2px solid rgba(255,255,255,.55);
+      border-radius: 18px;
+      padding: 12px 12px 10px;
+      box-shadow: 0 10px 18px rgba(55,18,92,.10);
+      position:relative;
+      overflow:hidden;
+    }
+    .prize::after{
+      content:"";
+      position:absolute;
+      top:-30px; right:-30px;
+      width:80px; height:80px;
+      background: radial-gradient(circle, rgba(255,134,200,.25), transparent 60%);
+    }
+    .prize .row{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .pill{
+      font-size:12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(138,109,182,.35);
+    }
+    .sub{
+      margin-top: 8px;
+      font-size: 12px;
+      opacity:.75;
+      text-align:left;
+    }
 
-button:active {
-    transform: scale(0.95);
-}
+    /* 操作区 */
+    .actions{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+    }
+    button{
+      flex:1;
+      border:0;
+      padding: 12px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      letter-spacing:.3px;
+      cursor:pointer;
+      box-shadow: 0 14px 22px rgba(55,18,92,.16);
+      transition: transform .08s ease;
+    }
+    button:active{ transform: scale(.98) }
+    .btn-main{
+      background: linear-gradient(135deg, var(--accent), #ffb3de);
+      color: white;
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.75);
+      color: var(--ink);
+      border: 1px solid rgba(138,109,182,.35);
+    }
 
-.result {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-}
-</style>
+    .note{
+      margin-top:10px;
+      font-size: 12px;
+      opacity:.72;
+      text-align:center;
+    }
+
+    /* 弹窗 */
+    .modal-mask{
+      position:fixed; inset:0;
+      background: rgba(10,7,18,.46);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 22px;
+      z-index: 50;
+    }
+    .modal{
+      width:min(420px, 92vw);
+      background: var(--card2);
+      border-radius: 22px;
+      box-shadow: 0 22px 60px rgba(0,0,0,.22);
+      overflow:hidden;
+      transform: translateY(10px) scale(.98);
+      opacity:0;
+      animation: pop .22s ease forwards;
+      position:relative;
+    }
+    @keyframes pop{
+      to{ transform: translateY(0) scale(1); opacity:1 }
+    }
+    .modal .top{
+      padding: 16px 16px 10px;
+      background:
+        radial-gradient(420px 120px at 50% 0%, rgba(255,134,200,.28), transparent 60%),
+        linear-gradient(180deg, rgba(182,156,255,.55), rgba(255,255,255,.0));
+      border-bottom: 1px solid rgba(138,109,182,.22);
+    }
+    .modal h3{
+      margin:0;
+      font-size:18px;
+      text-align:center;
+    }
+    .modal .content{
+      padding: 12px 16px 16px;
+      text-align:center;
+    }
+    .big{
+      font-size: 26px;
+      font-weight: 900;
+      margin: 10px 0 2px;
+    }
+    .small{
+      font-size: 13px;
+      opacity:.75;
+      margin: 0 0 12px;
+    }
+    .modal .footer{
+      display:flex;
+      gap:10px;
+      padding: 0 16px 16px;
+    }
+
+    /* 祝贺特效层（粒子/彩带） */
+    .fx-layer{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .spark{
+      position:absolute;
+      width:8px; height:8px;
+      border-radius: 2px;
+      opacity:0;
+      transform: translate(-50%,-50%);
+      animation: spark 900ms ease-out forwards;
+      box-shadow: 0 0 18px rgba(255,255,255,.6);
+    }
+    @keyframes spark{
+      0%{ opacity:0; transform: translate(var(--x0), var(--y0)) scale(.6) rotate(0deg) }
+      15%{ opacity:1 }
+      100%{ opacity:0; transform: translate(var(--x1), var(--y1)) scale(1.1) rotate(260deg) }
+    }
+    .shine{
+      position:absolute;
+      inset:-20%;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,.55), transparent 60%);
+      transform: translateX(-60%) rotate(10deg);
+      animation: shine 650ms ease-out forwards;
+      opacity:0;
+    }
+    @keyframes shine{
+      0%{ opacity:0; transform: translateX(-70%) rotate(12deg) }
+      30%{ opacity:1 }
+      100%{ opacity:0; transform: translateX(70%) rotate(12deg) }
+    }
+
+    /* 小屏优化 */
+    @media (max-width: 380px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="awning"></div>
 
-<div class="header">
-    🎀 库洛米生日一番赏 🎀
-    <div class="subtitle">Kuromi Special Kuji</div>
-</div>
+  <div class="wrap">
+    <div class="frame">
+      <!-- 四个角蝴蝶结 -->
+      <div class="bow tl"><span class="knot"></span></div>
+      <div class="bow tr"><span class="knot"></span></div>
+      <div class="bow bl"><span class="knot"></span></div>
+      <div class="bow br"><span class="knot"></span></div>
 
-<div class="container">
+      <!-- 星星爱心点缀 -->
+      <div class="doodles" aria-hidden="true">
+        <div class="dot star" style="left:16%; top:18%;">★</div>
+        <div class="dot" style="left:28%; top:26%; animation-delay:.3s;">♥</div>
+        <div class="dot star" style="left:78%; top:22%; animation-delay:.6s;">★</div>
+        <div class="dot" style="left:70%; top:34%; animation-delay:.9s;">♥</div>
+        <div class="dot star" style="left:12%; top:62%; animation-delay:1.2s;">★</div>
+        <div class="dot" style="left:22%; top:72%; animation-delay:1.5s;">♥</div>
+        <div class="dot star" style="left:86%; top:64%; animation-delay:1.8s;">★</div>
+        <div class="dot" style="left:76%; top:78%; animation-delay:2.1s;">♥</div>
+      </div>
 
-    <!-- 🎁 奖品区域 -->
-    <div class="prize">
-        <h2>A赏</h2>
-        <div class="count">剩余数量：<span id="Acount">1</span></div>
+      <div class="title">
+        <h1>🎀 远远の一番くじ 🎀</h1>
+        <p>朋友专用 · 趣味抽赏（无支付）</p>
+      </div>
+
+      <div class="grid" id="prizeGrid"></div>
+
+      <div class="actions">
+        <button class="btn-main" id="drawBtn">抽一次</button>
+        <button class="btn-ghost" id="resetBtn">重置奖池</button>
+      </div>
+
+      <div class="note" id="noteText">提示：A/B/C 触发庆祝特效 ✨</div>
     </div>
+  </div>
 
-    <div class="prize">
-        <h2>B赏</h2>
-        <div class="count">剩余数量：<span id="Bcount">1</span></div>
+  <!-- 弹窗 -->
+  <div class="modal-mask" id="mask">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="fx-layer" id="fxLayer"></div>
+      <div class="top">
+        <h3 id="modalTitle">抽赏结果</h3>
+      </div>
+      <div class="content">
+        <div class="big" id="resultBig">—</div>
+        <p class="small" id="resultSmall">—</p>
+      </div>
+      <div class="footer">
+        <button class="btn-main" id="againBtn">再抽一次</button>
+        <button class="btn-ghost" id="closeBtn">关闭</button>
+      </div>
     </div>
+  </div>
 
-    <div class="prize">
-        <h2>C赏</h2>
-        <div class="count">剩余数量：<span id="Ccount">1</span></div>
-    </div>
+  <script>
+    // ✅ 在这里改数量就行（你要的：A1 B1 C1 D2 E2 F3）
+    const initialPrizes = [
+      { name: "A赏", count: 1, tier: "top" },
+      { name: "B赏", count: 1, tier: "top" },
+      { name: "C赏", count: 1, tier: "top" },
+      { name: "D赏", count: 2, tier: "normal" },
+      { name: "E赏", count: 2, tier: "normal" },
+      { name: "F赏", count: 3, tier: "normal" },
+    ];
 
-    <div class="prize">
-        <h2>D赏</h2>
-        <div class="count">剩余数量：<span id="Dcount">2</span></div>
-    </div>
+    let prizes = structuredClone(initialPrizes);
 
-    <!-- 🎲 抽奖按钮 -->
-    <button onclick="drawPrize()">抽一次</button>
+    const prizeGrid = document.getElementById("prizeGrid");
+    const drawBtn = document.getElementById("drawBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const noteText = document.getElementById("noteText");
 
-    <div class="result" id="result"></div>
+    const mask = document.getElementById("mask");
+    const resultBig = document.getElementById("resultBig");
+    const resultSmall = document.getElementById("resultSmall");
+    const closeBtn = document.getElementById("closeBtn");
+    const againBtn = document.getElementById("againBtn");
+    const fxLayer = document.getElementById("fxLayer");
 
-</div>
-
-<script>
-let prizes = [
-    { name: "A赏", count: 1 },
-    { name: "B赏", count: 1 },
-    { name: "C赏", count: 1 },
-    { name: "D赏", count: 2 }
-];
-
-function updateDisplay() {
-    document.getElementById("Acount").innerText = prizes[0].count;
-    document.getElementById("Bcount").innerText = prizes[1].count;
-    document.getElementById("Ccount").innerText = prizes[2].count;
-    document.getElementById("Dcount").innerText = prizes[3].count;
-}
-
-function drawPrize() {
-    let available = prizes.filter(p => p.count > 0);
-    if (available.length === 0) {
-        document.getElementById("result").innerText = "已经全部抽完啦 🎀";
-        return;
+    function totalLeft(){
+      return prizes.reduce((s,p)=>s+p.count,0);
     }
 
-    let random = available[Math.floor(Math.random() * available.length)];
-    random.count--;
+    function render(){
+      prizeGrid.innerHTML = prizes.map(p => `
+        <div class="prize">
+          <div class="row">
+            <div class="tag">${p.tier==="top" ? "✨" : "🎀"} ${p.name}</div>
+            <div class="pill">剩余：<b>${p.count}</b></div>
+          </div>
+          <div class="sub">总剩余：${totalLeft()} 抽</div>
+        </div>
+      `).join("");
 
-    document.getElementById("result").innerText = "恭喜抽中 " + random.name + " 💜";
-    updateDisplay();
-}
+      drawBtn.disabled = totalLeft() === 0;
+      drawBtn.style.opacity = drawBtn.disabled ? 0.65 : 1;
+      noteText.textContent = totalLeft() === 0 ? "已经全部抽完啦 🎀（可点重置）" : "提示：A/B/C 触发庆祝特效 ✨";
+    }
 
-updateDisplay();
-</script>
+    function pickOne(){
+      const pool = prizes.filter(p => p.count > 0);
+      if(pool.length === 0) return null;
+      const picked = pool[Math.floor(Math.random() * pool.length)];
+      picked.count -= 1;
+      return picked;
+    }
 
+    function openModal(title, subtitle, celebrate=false){
+      resultBig.textContent = title;
+      resultSmall.textContent = subtitle;
+      mask.style.display = "flex";
+
+      // 清特效
+      fxLayer.innerHTML = "";
+
+      if(celebrate){
+        // 闪光扫过
+        const shine = document.createElement("div");
+        shine.className = "shine";
+        fxLayer.appendChild(shine);
+
+        // 粒子（彩带/星星感）
+        const colors = ["rgba(255,134,200,.95)","rgba(255,210,122,.95)","rgba(255,255,255,.95)","rgba(182,156,255,.95)"];
+        const cx = 50, cy = 40; // 弹窗上半部附近
+        for(let i=0;i<34;i++){
+          const s = document.createElement("div");
+          s.className = "spark";
+          const c = colors[i % colors.length];
+          s.style.background = c;
+
+          const x0 = `${cx + (Math.random()*10-5)}%`;
+          const y0 = `${cy + (Math.random()*8-4)}%`;
+
+          const dx = (Math.random() * 120 - 60);
+          const dy = (Math.random() * 140 - 20);
+
+          s.style.setProperty("--x0", `calc(${x0} - 0px)`);
+          s.style.setProperty("--y0", `calc(${y0} - 0px)`);
+          s.style.setProperty("--x1", `calc(${x0} + ${dx}px)`);
+          s.style.setProperty("--y1", `calc(${y0} + ${dy}px)`);
+
+          s.style.left = x0;
+          s.style.top  = y0;
+
+          s.style.animationDelay = `${Math.random()*120}ms`;
+          fxLayer.appendChild(s);
+        }
+      }
+    }
+
+    function closeModal(){
+      mask.style.display = "none";
+      fxLayer.innerHTML = "";
+    }
+
+    drawBtn.addEventListener("click", () => {
+      const picked = pickOne();
+      if(!picked){
+        openModal("已经抽完啦 🎀", "可以点击“重置奖池”重新开始～", false);
+        render();
+        return;
+      }
+
+      const left = totalLeft();
+      const isTop = ["A赏","B赏","C赏"].includes(picked.name);
+      openModal(
+        `恭喜抽中 ${picked.name} 💜`,
+        `当前还剩 ${left} 抽`,
+        isTop
+      );
+      render();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      prizes = structuredClone(initialPrizes);
+      render();
+      openModal("奖池已重置 🎀", "可以重新开始抽啦～", false);
+    });
+
+    closeBtn.addEventListener("click", closeModal);
+    mask.addEventListener("click", (e)=>{ if(e.target === mask) closeModal(); });
+    againBtn.addEventListener("click", ()=>{
+      closeModal();
+      drawBtn.click();
+    });
+
+    render();
+  </script>
 </body>
 </html>
