@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuromi 一番赏</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background: linear-gradient(to bottom, #d8b4f8, #a855f7);
+    text-align: center;
+    color: white;
+}
+
+.header {
+    background: #6b21a8;
+    padding: 20px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.subtitle {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.container {
+    padding: 20px;
+}
+
+.prize {
+    background: rgba(255,255,255,0.15);
+    border-radius: 15px;
+    margin: 15px 0;
+    padding: 15px;
+}
+
+.prize h2 {
+    margin: 5px 0;
+}
+
+.count {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    border-radius: 30px;
+    border: none;
+    font-size: 16px;
+    background: #f472b6;
+    color: white;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+.result {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    🎀 库洛米生日一番赏 🎀
+    <div class="subtitle">Kuromi Special Kuji</div>
+</div>
+
+<div class="container">
+
+    <!-- 🎁 奖品区域 -->
+    <div class="prize">
+        <h2>A赏</h2>
+        <div class="count">剩余数量：<span id="Acount">1</span></div>
+    </div>
+
+    <div class="prize">
+        <h2>B赏</h2>
+        <div class="count">剩余数量：<span id="Bcount">1</span></div>
+    </div>
+
+    <div class="prize">
+        <h2>C赏</h2>
+        <div class="count">剩余数量：<span id="Ccount">1</span></div>
+    </div>
+
+    <div class="prize">
+        <h2>D赏</h2>
+        <div class="count">剩余数量：<span id="Dcount">2</span></div>
+    </div>
+
+    <!-- 🎲 抽奖按钮 -->
+    <button onclick="drawPrize()">抽一次</button>
+
+    <div class="result" id="result"></div>
+
+</div>
+
+<script>
+let prizes = [
+    { name: "A赏", count: 1 },
+    { name: "B赏", count: 1 },
+    { name: "C赏", count: 1 },
+    { name: "D赏", count: 2 }
+];
+
+function updateDisplay() {
+    document.getElementById("Acount").innerText = prizes[0].count;
+    document.getElementById("Bcount").innerText = prizes[1].count;
+    document.getElementById("Ccount").innerText = prizes[2].count;
+    document.getElementById("Dcount").innerText = prizes[3].count;
+}
+
+function drawPrize() {
+    let available = prizes.filter(p => p.count > 0);
+    if (available.length === 0) {
+        document.getElementById("result").innerText = "已经全部抽完啦 🎀";
+        return;
+    }
+
+    let random = available[Math.floor(Math.random() * available.length)];
+    random.count--;
+
+    document.getElementById("result").innerText = "恭喜抽中 " + random.name + " 💜";
+    updateDisplay();
+}
+
+updateDisplay();
+</script>
+
+</body>
+</html>
